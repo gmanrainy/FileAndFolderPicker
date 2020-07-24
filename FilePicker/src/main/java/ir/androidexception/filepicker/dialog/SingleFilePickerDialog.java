@@ -9,15 +9,19 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
+
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+
 import ir.androidexception.filepicker.R;
 import ir.androidexception.filepicker.adapter.FileAdapter;
 import ir.androidexception.filepicker.databinding.DialogPickerBinding;
@@ -39,6 +43,8 @@ public class SingleFilePickerDialog extends Dialog implements OnPathChangeListen
     private OnCancelPickerDialogListener onCancelPickerDialogListener;
     private OnConfirmDialogListener onConfirmDialogListener;
     private File file;
+    private List<String> allowedFileTypes = null;
+
     public SingleFilePickerDialog(@NonNull Context context, OnCancelPickerDialogListener onCancelPickerDialogListener,
                                   OnConfirmDialogListener onConfirmDialogListener) {
         super(context);
@@ -60,11 +66,11 @@ public class SingleFilePickerDialog extends Dialog implements OnPathChangeListen
         fab = binding.fab;
         close = binding.ivClose;
 
-        if(Util.permissionGranted(context)){
+        if (Util.permissionGranted(context)) {
             binding.setPath("Internal Storage" + context.getString(R.string.arrow));
             binding.setBusySpace(Util.bytesToHuman(Util.busyMemory()));
             binding.setTotalSpace(Util.bytesToHuman(Util.totalMemory()));
-            int busySpacePercent = (int)(((float)Util.busyMemory() / Util.totalMemory()) * 100);
+            int busySpacePercent = (int) (((float) Util.busyMemory() / Util.totalMemory()) * 100);
             binding.setBusySpacePercent(busySpacePercent + "%");
             binding.progressView.setProgress(busySpacePercent);
 
@@ -74,7 +80,7 @@ public class SingleFilePickerDialog extends Dialog implements OnPathChangeListen
     }
 
 
-    private void setupClickListener(){
+    private void setupClickListener() {
         close.setOnClickListener(v -> {
             onCancelPickerDialogListener.onCanceled();
             this.cancel();
@@ -90,12 +96,18 @@ public class SingleFilePickerDialog extends Dialog implements OnPathChangeListen
         List<Item> items = new ArrayList<>();
         File internalStorage = Environment.getExternalStorageDirectory();
         List<File> children = new ArrayList<>(Arrays.asList(Objects.requireNonNull(internalStorage.listFiles())));
-        for (File file : children){
+        for (File file : children) {
             items.add(new Item(file));
         }
         adapter = new FileAdapter(context, items, this, this);
+        adapter.setAllowedFileTypes(allowedFileTypes);
         recyclerViewDirectories.setAdapter(adapter);
         recyclerViewDirectories.setNestedScrollingEnabled(false);
+    }
+
+    public SingleFilePickerDialog setAllowedFileTypes(List<String> allowedFileTypes) {
+        this.allowedFileTypes = allowedFileTypes;
+        return this;
     }
 
     @Override
@@ -116,7 +128,7 @@ public class SingleFilePickerDialog extends Dialog implements OnPathChangeListen
     @Override
     public void onSelected(File f) {
         file = f;
-        if(f==null) fab.setVisibility(View.GONE);
+        if (f == null) fab.setVisibility(View.GONE);
         else fab.setVisibility(View.VISIBLE);
     }
 }

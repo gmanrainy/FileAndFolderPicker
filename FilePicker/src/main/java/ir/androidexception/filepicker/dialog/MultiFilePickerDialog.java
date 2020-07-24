@@ -9,15 +9,19 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
+
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+
 import ir.androidexception.filepicker.R;
 import ir.androidexception.filepicker.adapter.FileAdapter;
 import ir.androidexception.filepicker.databinding.DialogPickerBinding;
@@ -39,6 +43,8 @@ public class MultiFilePickerDialog extends Dialog implements OnPathChangeListene
     private OnCancelPickerDialogListener onCancelPickerDialogListener;
     private OnConfirmDialogListener onConfirmDialogListener;
     private List<File> files;
+    private List<String> allowedFileTypes = null;
+
     public MultiFilePickerDialog(@NonNull Context context, OnCancelPickerDialogListener onCancelPickerDialogListener,
                                  OnConfirmDialogListener onConfirmDialogListener) {
         super(context);
@@ -46,7 +52,6 @@ public class MultiFilePickerDialog extends Dialog implements OnPathChangeListene
         this.onCancelPickerDialogListener = onCancelPickerDialogListener;
         this.onConfirmDialogListener = onConfirmDialogListener;
     }
-
 
 
     @Override
@@ -61,7 +66,7 @@ public class MultiFilePickerDialog extends Dialog implements OnPathChangeListene
         fab = binding.fab;
         close = binding.ivClose;
 
-        if(Util.permissionGranted(context)) {
+        if (Util.permissionGranted(context)) {
             binding.setPath("Internal Storage" + context.getString(R.string.arrow));
             binding.setBusySpace(Util.bytesToHuman(Util.busyMemory()));
             binding.setTotalSpace(Util.bytesToHuman(Util.totalMemory()));
@@ -77,7 +82,7 @@ public class MultiFilePickerDialog extends Dialog implements OnPathChangeListene
     }
 
 
-    private void setupClickListener(){
+    private void setupClickListener() {
         close.setOnClickListener(v -> {
             onCancelPickerDialogListener.onCanceled();
             this.cancel();
@@ -85,7 +90,7 @@ public class MultiFilePickerDialog extends Dialog implements OnPathChangeListene
 
         fab.setOnClickListener(v -> {
             File[] fs = new File[files.size()];
-            for(int i=0; i<files.size(); i++) fs[i] = files.get(i);
+            for (int i = 0; i < files.size(); i++) fs[i] = files.get(i);
             onConfirmDialogListener.onConfirmed(fs);
             this.cancel();
         });
@@ -95,20 +100,20 @@ public class MultiFilePickerDialog extends Dialog implements OnPathChangeListene
         List<Item> items = new ArrayList<>();
         File internalStorage = Environment.getExternalStorageDirectory();
         List<File> children = new ArrayList<>(Arrays.asList(Objects.requireNonNull(internalStorage.listFiles())));
-        for (File file : children){
+        for (File file : children) {
             items.add(new Item(file));
         }
 
-//        items.add(new Item(internalStorage));
-//        String sdPath = Util.getSDCardPath(context);
-//        if(sdPath!=null) {
-//            items.add(new Item(new File(sdPath)));
-//        }
-
         adapter = new FileAdapter(context, items, this, this);
         adapter.setMultiFileSelect(true);
+        adapter.setAllowedFileTypes(allowedFileTypes);
         recyclerViewDirectories.setAdapter(adapter);
         recyclerViewDirectories.setNestedScrollingEnabled(false);
+    }
+
+    public MultiFilePickerDialog setAllowedFileTypes(List<String> allowedFileTypes) {
+        this.allowedFileTypes = allowedFileTypes;
+        return this;
     }
 
     @Override
@@ -128,10 +133,10 @@ public class MultiFilePickerDialog extends Dialog implements OnPathChangeListene
 
     @Override
     public void onSelected(File f) {
-        if(files.contains(f)) files.remove(f);
+        if (files.contains(f)) files.remove(f);
         else files.add(f);
 
-        if(files.isEmpty()) fab.setVisibility(View.GONE);
+        if (files.isEmpty()) fab.setVisibility(View.GONE);
         else fab.setVisibility(View.VISIBLE);
     }
 }
