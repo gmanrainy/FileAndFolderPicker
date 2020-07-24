@@ -2,6 +2,7 @@ package ir.androidexception.filepicker.adapter;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -66,6 +67,15 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
             return items.size();
         else
             return 0;
+    }
+
+    public void selectAllFiles() {
+        Log.d(TAG, "selectAllFiles");
+        for (int i = 0; i < items.size(); i++) {
+            items.get(i).setSelected(true);
+            onSelectItemListener.onMultiSelect(items.get(i).getFile());
+            notifyItemChanged(i);
+        }
     }
 
     public void setMultiFileSelect(boolean multiFileSelect) {

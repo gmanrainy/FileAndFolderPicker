@@ -94,6 +94,11 @@ public class MultiFilePickerDialog extends Dialog implements OnPathChangeListene
             onConfirmDialogListener.onConfirmed(fs);
             this.cancel();
         });
+
+        fab.setOnLongClickListener(v -> {
+            adapter.selectAllFiles();
+            return true;
+        });
     }
 
     private void setupDirectoriesListRecyclerView() {
@@ -138,5 +143,12 @@ public class MultiFilePickerDialog extends Dialog implements OnPathChangeListene
 
         if (files.isEmpty()) fab.setVisibility(View.GONE);
         else fab.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onMultiSelect(File f) {
+        if (!files.contains(f)) {
+            files.add(f);
+        }
     }
 }

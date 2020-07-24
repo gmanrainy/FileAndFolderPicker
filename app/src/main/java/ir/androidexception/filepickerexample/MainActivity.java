@@ -49,7 +49,11 @@ public class MainActivity extends AppCompatActivity {
             if(permissionGranted()) {
                 MultiFilePickerDialog multiFilePickerDialog = new MultiFilePickerDialog(this,
                         () -> Toast.makeText(MainActivity.this, "Canceled!!", Toast.LENGTH_SHORT).show(),
-                        files -> Toast.makeText(MainActivity.this, files[0].getPath(), Toast.LENGTH_SHORT).show()
+                        files -> {
+                            for(File file : files) {
+                                Toast.makeText(MainActivity.this, file.getPath(), Toast.LENGTH_SHORT).show();
+                            }
+                        }
                 );
                 multiFilePickerDialog.show();
             }

@@ -131,4 +131,9 @@ public class SingleFilePickerDialog extends Dialog implements OnPathChangeListen
         if (f == null) fab.setVisibility(View.GONE);
         else fab.setVisibility(View.VISIBLE);
     }
+
+    @Override
+    public void onMultiSelect(File file) {
+        
+    }
 }
