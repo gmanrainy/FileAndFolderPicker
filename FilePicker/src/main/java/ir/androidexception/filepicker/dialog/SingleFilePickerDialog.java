@@ -96,8 +96,18 @@ public class SingleFilePickerDialog extends Dialog implements OnPathChangeListen
         List<Item> items = new ArrayList<>();
         File internalStorage = Environment.getExternalStorageDirectory();
         List<File> children = new ArrayList<>(Arrays.asList(Objects.requireNonNull(internalStorage.listFiles())));
+        children = Util.sortFilesList(children);
         for (File file : children) {
-            items.add(new Item(file));
+            if (file.isFile() && allowedFileTypes != null) {
+                for (String allowedFileType : allowedFileTypes) {
+                    if (file.getAbsolutePath().endsWith(allowedFileType)) {
+                        items.add(new Item(file));
+                        break;
+                    }
+                }
+            } else {
+                items.add(new Item(file));
+            }
         }
         adapter = new FileAdapter(context, items, this, this);
         adapter.setAllowedFileTypes(allowedFileTypes);
@@ -134,6 +144,6 @@ public class SingleFilePickerDialog extends Dialog implements OnPathChangeListen
 
     @Override
     public void onMultiSelect(File file) {
-        
+
     }
 }

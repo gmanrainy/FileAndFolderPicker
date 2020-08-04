@@ -106,7 +106,16 @@ public class MultiFilePickerDialog extends Dialog implements OnPathChangeListene
         File internalStorage = Environment.getExternalStorageDirectory();
         List<File> children = new ArrayList<>(Arrays.asList(Objects.requireNonNull(internalStorage.listFiles())));
         for (File file : children) {
-            items.add(new Item(file));
+            if(file.isFile() && allowedFileTypes != null) {
+                for(String allowedFileType : allowedFileTypes) {
+                    if(file.getAbsolutePath().endsWith(allowedFileType)) {
+                        items.add(new Item(file));
+                        break;
+                    }
+                }
+            } else {
+                items.add(new Item(file));
+            }
         }
 
         adapter = new FileAdapter(context, items, this, this);

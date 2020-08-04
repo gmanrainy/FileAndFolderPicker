@@ -19,6 +19,10 @@ public class Item {
         this.file = file;
     }
 
+    public Item() {
+
+    }
+
     public File getFile() {
         return file;
     }

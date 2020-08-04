@@ -14,10 +14,14 @@ import android.provider.MediaStore;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
 import java.io.File;
 import java.text.DecimalFormat;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import ir.androidexception.filepicker.R;
 
@@ -26,7 +30,7 @@ public class Util {
     public static final int FOLDER_CATEGORY = 0;
     public static final int VIDEO_CATEGORY = 1;
     private static List<String> videoFormats = Arrays.asList(
-            "mp4","webm", "mkv", "flv", "vob", "ogv", "mpg", "mp2", "avi",
+            "mp4", "webm", "mkv", "flv", "vob", "ogv", "mpg", "mp2", "avi",
             "mov", "wmv", "asf", "amv", "m4p", "m4v", "mpeg", "3gp"
     );
     public static final int MUSIC_CATEGORY = 2;
@@ -40,118 +44,134 @@ public class Util {
     );
     public static final int DOCUMENT_CATEGORY = 4;
     private static List<String> documentFormats = Arrays.asList(
-            "pdf", "txt" , "ppt" , "pptx" , "xls" , "xlsx" , "dox" , "docx"
+            "pdf", "txt", "ppt", "pptx", "xls", "xlsx", "dox", "docx"
     );
     public static final int OTHER_CATEGORY = 5;
 
 
-
     public static int getFileCategory(File file) {
-        if(file.isDirectory())
+        if (file.isDirectory())
             return FOLDER_CATEGORY;
         String format = file.getName().substring(file.getName().lastIndexOf(".") + 1);
-        if(videoFormats.contains(format))
+        if (videoFormats.contains(format))
             return VIDEO_CATEGORY;
-        if(musicFormats.contains(format))
+        if (musicFormats.contains(format))
             return MUSIC_CATEGORY;
-        if(imageFormats.contains(format))
+        if (imageFormats.contains(format))
             return IMAGE_CATEGORY;
-        if(documentFormats.contains(format))
+        if (documentFormats.contains(format))
             return DOCUMENT_CATEGORY;
 
         return OTHER_CATEGORY;
 
     }
 
-    public static String changePathFormat(Context context, String path){
+    public static String changePathFormat(Context context, String path) {
         File internalStorage = Environment.getExternalStorageDirectory();
         String internalStoragePath = internalStorage.getPath();
         path = path.replace(internalStoragePath, "Internal Storage");
         return path.replaceAll("/", context.getString(R.string.arrow));
     }
 
-    public static Bitmap fetchMusicCover(File file){
+    public static Bitmap fetchMusicCover(File file) {
         MediaMetadataRetriever mmr = new MediaMetadataRetriever();
         mmr.setDataSource(file.getPath());
-        byte [] data = mmr.getEmbeddedPicture();
-        if(data != null) {
+        byte[] data = mmr.getEmbeddedPicture();
+        if (data != null) {
             return BitmapFactory.decodeByteArray(data, 0, data.length);
-        }
-        else {
+        } else {
             return null;
         }
     }
 
-    public static Bitmap fetchVideoPreview(File file){
+    public static Bitmap fetchVideoPreview(File file) {
         return ThumbnailUtils.createVideoThumbnail(file.getPath(), MediaStore.Images.Thumbnails.MINI_KIND);
     }
 
-
-
-
-
     public static long totalMemory() {
-        StatFs internalStatFs = new StatFs( Environment.getRootDirectory().getAbsolutePath() );
+        StatFs internalStatFs = new StatFs(Environment.getRootDirectory().getAbsolutePath());
         long internalTotal;
 
-        StatFs externalStatFs = new StatFs( Environment.getExternalStorageDirectory().getAbsolutePath() );
+        StatFs externalStatFs = new StatFs(Environment.getExternalStorageDirectory().getAbsolutePath());
         long externalTotal;
 
-        internalTotal = ( internalStatFs.getBlockCountLong() * internalStatFs.getBlockSizeLong() );
-        externalTotal = ( externalStatFs.getBlockCountLong() * externalStatFs.getBlockSizeLong() ) ;
+        internalTotal = (internalStatFs.getBlockCountLong() * internalStatFs.getBlockSizeLong());
+        externalTotal = (externalStatFs.getBlockCountLong() * externalStatFs.getBlockSizeLong());
 
         long total = internalTotal + externalTotal;
 
         return total;
     }
 
-    public static Long freeMemory(){
+    public static Long freeMemory() {
         StatFs statFs = new StatFs(Environment.getExternalStorageDirectory().getAbsolutePath());
-        long   free   = (statFs.getAvailableBlocksLong() * statFs.getBlockSizeLong());
+        long free = (statFs.getAvailableBlocksLong() * statFs.getBlockSizeLong());
         return free;
     }
 
-    public static Long busyMemory(){
+    public static Long busyMemory() {
         StatFs statFs = new StatFs(Environment.getRootDirectory().getAbsolutePath());
-        long   total  = totalMemory();
-        long   free   = freeMemory();
-        long   busy   = total - free;
+        long total = totalMemory();
+        long free = freeMemory();
+        long busy = total - free;
         return busy;
     }
 
-    public static String floatForm (double d)
-    {
+    public static String floatForm(double d) {
         return new DecimalFormat("#.##").format(d);
     }
 
-    public static String bytesToHuman (Long size) {
-        long Kb = 1  * 1024;
+    public static String bytesToHuman(Long size) {
+        long Kb = 1 * 1024;
         long Mb = Kb * 1024;
         long Gb = Mb * 1024;
         long Tb = Gb * 1024;
         long Pb = Tb * 1024;
         long Eb = Pb * 1024;
 
-        if (size <  Kb)                 return floatForm(        size        ) + " Byte";
-        if (size >= Kb && size < Mb)    return floatForm((double)size / Kb) + " KB";
-        if (size >= Mb && size < Gb)    return floatForm((double)size / Mb) + " MB";
-        if (size >= Gb && size < Tb)    return floatForm((double)size / Gb) + " GB";
-        if (size >= Tb && size < Pb)    return floatForm((double)size / Tb) + " TB";
-        if (size >= Pb && size < Eb)    return floatForm((double)size / Pb) + " PB";
-        if (size >= Eb)                 return floatForm((double)size / Eb) + " EB";
+        if (size < Kb) return floatForm(size) + " Byte";
+        if (size >= Kb && size < Mb) return floatForm((double) size / Kb) + " KB";
+        if (size >= Mb && size < Gb) return floatForm((double) size / Mb) + " MB";
+        if (size >= Gb && size < Tb) return floatForm((double) size / Gb) + " GB";
+        if (size >= Tb && size < Pb) return floatForm((double) size / Tb) + " TB";
+        if (size >= Pb && size < Eb) return floatForm((double) size / Pb) + " PB";
+        if (size >= Eb) return floatForm((double) size / Eb) + " EB";
 
         return "???";
     }
 
 
-    public static boolean permissionGranted(Context context){
+    public static boolean permissionGranted(Context context) {
         return ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
                 && ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
     }
 
 
-    public static void requestPermission(Activity activity){
+    public static void requestPermission(Activity activity) {
         ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
     }
 
+    public static List<File> sortFilesListDesc(List<File> files) {
+        final Map<File, Long> constantLastModifiedTimes = new HashMap<File, Long>();
+        for (final File f : files) {
+            constantLastModifiedTimes.put(f, f.lastModified());
+        }
+        Collections.sort(files, (f1, f2) -> constantLastModifiedTimes.get(f1).compareTo(constantLastModifiedTimes.get(f2)));
+
+        return files;
+    }
+
+    public static List<File> sortFilesList(List<File> files) {
+        List<File> list = sortFilesListDesc(files);
+        Collections.reverse(list);
+        return list;
+    }
+
+    public static File[] sortFilesArrayDesc(File[] files) {
+        return sortFilesListDesc(Arrays.asList(files)).toArray(new File[0]);
+    }
+
+    public static File[] sortFilesArray(File[] files) {
+        return sortFilesList(Arrays.asList(files)).toArray(new File[0]);
+    }
 }

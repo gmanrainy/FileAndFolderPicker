@@ -16,6 +16,7 @@ import com.bumptech.glide.request.RequestOptions;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import ir.androidexception.filepicker.R;
@@ -119,8 +120,10 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
         File parent = currentPathFile.getParentFile();
         if (parent != null) {
             File[] files = parent.listFiles();
+
             List<Item> itemList = new ArrayList<>();
             if (files != null) {
+                files = Util.sortFilesArray(files);
                 if (directorySelect) {
                     for (File f : files) {
                         if (f.isDirectory())
@@ -128,7 +131,17 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
                     }
                 } else {
                     for (File f : files) {
-                        itemList.add(new Item(f));
+                        if (f.isFile() && allowedFileTypes != null) {
+                            for (String allowedFileType : allowedFileTypes) {
+                                if (f.getAbsolutePath().endsWith(allowedFileType)) {
+                                    itemList.add(new Item(f));
+                                    break;
+                                }
+                            }
+                        } else {
+                            itemList.add(new Item(f));
+                        }
+
                     }
                 }
 
@@ -151,6 +164,7 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
         }
 
         public void bind(Context context, Item item) {
+            files = Util.sortFilesList(files);
             for (File f : files) {
                 if (f.getPath().equals(item.getFile().getPath())) item.setSelected(true);
             }
@@ -218,6 +232,7 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
                     List<Item> newItems = new ArrayList<>();
                     File[] children = file.listFiles();
                     if (children != null) {
+                        children = Util.sortFilesArray(children);
                         if (directorySelect) {
                             for (File f : children) {
                                 if (f.isDirectory()) {
@@ -226,10 +241,11 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
                             }
                         } else {
                             for (File f : children) {
-                                if (allowedFileTypes != null) {
+                                if (f.isFile() && allowedFileTypes != null) {
                                     for (String allowedFileType : allowedFileTypes) {
                                         if (f.getAbsolutePath().endsWith(allowedFileType)) {
                                             newItems.add(new Item(f));
+                                            break;
                                         }
                                     }
                                 } else {
