@@ -8,7 +8,7 @@ This is a library for create a picker in your android application. You can pick 
 
 **This library is also available at JitPack.io**
 
-[![](https://jitpack.io/v/salehyarahmadi/FileAndFolderPicker.svg)](https://jitpack.io/#salehyarahmadi/FileAndFolderPicker)
+[![](https://jitpack.io/v/gmanrainy/FileAndFolderPicker.svg)](https://jitpack.io/#gmanrainy/FileAndFolderPicker)
 
 
 
